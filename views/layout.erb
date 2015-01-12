@@ -23,9 +23,17 @@
     <%= javascript_tag 'prism' %>
     <script>
       (function(d) {
-        var languages = ['coffeescript', 'javascript'];
         var selected = localStorage['language'];
-        var touch = 'ontouchstart' in window;
+        var togglerButton = d.querySelector('.toggler-button');
+        var switchKey = 's';
+
+        var toggleLanguage = function(selected) {
+          if (selected === 'javascript') {
+            switchTo('coffeescript');
+          } else {
+            switchTo('javascript');
+          }
+        };
 
         var switchTo = function(language) {
           if (language === 'javascript') {
@@ -41,24 +49,27 @@
           }
         };
 
-        d.addEventListener("keypress", function(event) {
-          if (!event.keyCode === 115) return;
-          if (selected === 'javascript') {
-            switchTo('coffeescript');
-          } else {
-            switchTo('javascript');
+        var inferLetter = function(keyEvent) {
+          var key = '';
+          if (keyEvent.key) key = keyEvent.key;
+          if (keyEvent.keyCode) key = String.fromCharCode(keyEvent.keyCode);
+          return key.toLowerCase();
+        };
+
+        var pressEventName = function() {
+          return ('ontouchstart' in window) ? 'touchend' : 'click';
+        };
+
+        d.addEventListener('keyup', function(event) {
+          if (inferLetter(event) === switchKey) {
+            toggleLanguage(selected);
           }
         }, false);
 
-        var togglerButton = d.querySelector('.toggler-button');
-        var eventName = touch ? 'touchend' : 'click';
-        togglerButton.addEventListener(eventName, function() {
-          if (selected === 'javascript') {
-            switchTo('coffeescript');
-          } else {
-            switchTo('javascript');
-          }
+        togglerButton.addEventListener(pressEventName(), function() {
+          toggleLanguage(selected);
         }, false);
+
         switchTo(selected || 'coffeescript');
       })(document);
     </script>
